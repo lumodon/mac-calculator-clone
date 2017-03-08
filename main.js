@@ -1,6 +1,39 @@
 'use strict'
+var DEBUG = true
+if(DEBUG){
+  var dbg = document.createElement('p')
+  dbg.textContent = 'default text'
+  dbg.style.position = 'absolute'
+  dbg.style.top = '0px'
+  document.querySelector('body').appendChild(dbg)
+}
+
+function dbgt() {
+  var argumentString = ''
+  for(var i of arguments) {
+    argumentString += i
+  }
+  dbg.textContent = '$ '+argumentString
+  console.log(argumentString)
+}
+
+(function(){
+  var originalErrFunction = console.error
+
+  console.error = function() {
+    var debugMessage = ['Error: ']
+    for(var i of arguments) {
+      debugMessage.push(i)
+    }
+    dbgt(debugMessage.join(''))
+    originalErrFunction.apply(null, arguments)
+  }
+}())
 
 function Calculator() {
+  this.operands = []
+  this.tailIndex = 0
+  this.clearOrAllClear = 'all'
   this.domElements = {
     'Numbers': [
       document.querySelector('.calculator-row:nth-child(5) > .calculator-field:nth-child(1) > button'),
@@ -29,31 +62,84 @@ function Calculator() {
     'History': document.querySelector('.calculator-history')
   }
 
-  this.handleNumberInput = function(numberInput) {
-    var nodeToAdd
-    if( this.domElements.CurrentInput.children.length > 0 ) { // If we already have an ongoing input
-      nodeToAdd = this.domElements.CurrentInput.firstChild
-      nodeToAdd.textContent += numberInput
-    } else {
+  this.updateDisplayNode = function() {
+    var nodeToAdd = this.domElements.CurrentInput.firstChild
+
+    if( !nodeToAdd ) {
       nodeToAdd = document.createElement('p')
-      nodeToAdd.textContent = numberInput
+      nodeToAdd.style.margin = 0
+      this.domElements.CurrentInput.appendChild(nodeToAdd)
     }
-    nodeToAdd.style.margin = 0
+    nodeToAdd.textContent = this.operands.join('')
+    this.domElements.Operators.Clear.textContent = this.clearOrAllClear === 'all' ? 'AC' : 'C'
+  }
+
+  this.handleNumberInput = function(numberInput) {
     if( this.domElements.History.children.length > 4 ) {
       this.domElements.History.removeChild( this.domElements.History.firstChild )
     }
-    if( this.domElements.CurrentInput.children.length > 0 ) {
-      this.domElements.History.appendChild( this.domElements.CurrentInput.firstChild )
+
+    if( this.operands.length-1 === this.tailIndex ) {
+      this.operands[this.tailIndex] += numberInput.toString()
+    } else {
+      this.operands.push(numberInput.toString())
     }
-    this.domElements.CurrentInput.appendChild( nodeToAdd )
+
+    this.clearOrAllClear = 'clear'
+    this.updateDisplayNode()
   }
 
   this.handleOperatorInput = function(operatorInput) {
-    console.log(operatorInput)
+    if( this.operands.length <= 0 && operatorInput !== 'Decimal') {
+      console.error('Operator pressed without any numbers to perform operation on')
+      return null
+    }
+
+    switch(operatorInput) {
+      case 'Decimal':
+        if( !this.operands[this.tailIndex] ) {
+          this.operands[this.tailIndex] = '0.'
+        } else if( !this.operands[this.tailIndex].split('').includes('.') ) {
+          this.operands[this.tailIndex] += '.'
+        }
+        this.clearOrAllClear = 'clear'
+        break
+      case 'Plus':
+        this.operands[this.tailIndex] += ' + '
+        this.tailIndex++
+        break
+      case 'Minus':
+        this.operands[this.tailIndex] += ' - '
+        this.tailIndex++
+        break
+      case 'Multiply':
+        this.operands[this.tailIndex] += ' x '
+        this.tailIndex++
+        break
+      case 'Divide':
+        this.operands[this.tailIndex] += ' ÷ '
+        this.tailIndex++
+        break
+      case 'Clear':
+        if(this.clearOrAllClear === 'clear') {
+          this.operands[this.tailIndex] = ''
+          this.clearOrAllClear = 'all'
+        } else {
+          this.tailIndex = 0
+          this.operands = []
+        }
+        break
+      case 'Flip':
+        break
+      case 'Equals':
+        break
+      default:
+        break
+    }
+    this.updateDisplayNode()
   }
 
   this.keyDownInterpreter = function(keyEvent) {
-    // Prevent double click when pressing enter
     var activeElement = document.activeElement
     activeElement.blur()
 
@@ -70,7 +156,7 @@ function Calculator() {
     }
     var keyCode = keyEvent.keyCode;
 
-    if( keyCode >= 48 && keyCode <= 57 ) { // 48 is 0, 57 is 9. between is other numbers
+    if( keyCode >= 48 && keyCode <= 57 ) {
       if( keyEvent.shiftKey && keyCode === 56 ) {
         this.handleOperatorInput.call(this, 'Multiply')
       } else if( keyEvent.shiftKey && keyCode === 53 ) {
@@ -83,24 +169,17 @@ function Calculator() {
         this.handleOperatorInput.call(this, 'Plus')
       } else if( getOperatorFromCode.hasOwnProperty(keyCode) ) {
         this.handleOperatorInput.call(this, getOperatorFromCode[keyCode] + keyEvent)
-      } else {
-        // NOTE: Remove these lines before posting to prrr; for debug only
-        // console.log('Keycode: ', keyCode)
       }
     }
 
-    // Give focus back to element now that key has been handeled
-    // timeout required so that enter doesn't continue to activate focused button
     window.setTimeout( function() {
       activeElement.focus()
-    }, 1 ) // Even a single millisecond is enough to consistantly stop the problem. Amazing.
+    }, 1 )
   }
 
   this.initialize = function() {
-    // Handle keyboard events
     document.addEventListener('keydown', this.keyDownInterpreter.bind(this), false)
 
-    // Populate onclick handlers for calculator buttons
     for(var i = 0; i < 10; i++) {
       this.domElements.Numbers[ i ].onclick = Calculator.scopeLock.call(this, i, this.handleNumberInput.bind(this) )
     }
@@ -111,7 +190,6 @@ function Calculator() {
   }
 }
 
-// Static method - Helper function
 Calculator.scopeLock = function(capturedArg, callback) {
   return function() {
     callback(capturedArg)
@@ -120,3 +198,4 @@ Calculator.scopeLock = function(capturedArg, callback) {
 
 var calc = new Calculator()
 calc.initialize()
+calc.updateDisplayNode()
