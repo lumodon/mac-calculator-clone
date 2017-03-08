@@ -11,10 +11,13 @@ body {
 
 .calculator-history {
   height: 40%;
+  overflow: hidden;
+  z-index: 4;
 }
 
-.calculator-input {
+.calculator-current-input {
   height: 60%;
+  z-index: 5;
 }
 
 .calculator-container {
@@ -23,11 +26,13 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1;
 }
 
 .calculator-window {
   border: 1px solid black;
   border-radius: 10px;
+  z-index: 2;
 }
 
 @media (max-width:767px) {
@@ -75,11 +80,13 @@ body {
   .calculator-control {
     width: 30vw; /* Without this, a horizontal scroll bar always appears. Whats a better way to handle this? */
     height: 45vw;
+    z-index: 4;
   }
 
   .calculator-field {
     width: 7.5vw;
     height: 7.5vw;
+    z-index: 5;
   }
 
   .calculator-field.wide {
@@ -108,6 +115,7 @@ body {
   width: 100%;
   height: 100%;
   font-size: 1.40em;
+  z-index: 6;
 }
 
 .calculator-field:nth-child(4) button, .calculator-row:nth-child(5) .calculator-field:nth-child(3) button {
