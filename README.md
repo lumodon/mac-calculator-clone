@@ -16,6 +16,8 @@ _...and this_
 
 ## Specs
 
+#Specs can be found [here](http://jsdev.learnersguild.org/goals/150-Mac_Calculator_Clone.html)
+
 ### Stage 1
 - [ ] All text is in the Roboto web font
 - [ ] Your HTML and CSS follows this style guide

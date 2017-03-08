@@ -1,0 +1,132 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto');
+
+html, body {
+  height: 100%;
+}
+
+body {
+  font-family: 'Roboto';
+  font-weight: 100;
+}
+
+.calculator-history {
+  height: 40%;
+}
+
+.calculator-input {
+  height: 60%;
+}
+
+.calculator-container {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calculator-window {
+  border: 1px solid black;
+  border-radius: 10px;
+}
+
+@media (max-width:767px) {
+  body {
+    font-size: 1.5em;
+  }
+
+  .calculator-window {
+    width: 224px;
+    height: 340px;
+    overflow: auto; 
+  }
+
+  .calculator-control {
+    width: 224px;
+    height: 240px;
+  }
+
+  .calculator-field {
+    width: 56px;
+    height: 48px;
+  }
+
+  .calculator-field.wide {
+    width: 112px;
+  }
+
+  .calculator-display {
+    height: 100px;
+    width: 224px;
+  }
+}
+
+@media (min-width:768px) {
+  body {
+    font-size: 2vw;
+  }
+
+  .calculator-window {
+    width: 30vw;
+    height: 52.5vw;
+    overflow: hidden;
+  }
+
+  .calculator-control {
+    width: 30vw; /* Without this, a horizontal scroll bar always appears. Whats a better way to handle this? */
+    height: 45vw;
+  }
+
+  .calculator-field {
+    width: 7.5vw;
+    height: 7.5vw;
+  }
+
+  .calculator-field.wide {
+    width: 15vw;
+  }
+
+  .calculator-display {
+    height: 15vw;
+  }
+}
+
+.calculator-field {
+  display: inline-block;
+}
+
+.calculator-display {
+  background-color: #A0A0A0;
+  color: white;
+}
+
+.calculator-field button {
+  background-color: #E0E0E0;
+  transition: 100ms;
+  border: none;
+  outline: 1px solid black;
+  width: 100%;
+  height: 100%;
+  font-size: 1.40em;
+}
+
+.calculator-field:nth-child(4) button, .calculator-row:nth-child(5) .calculator-field:nth-child(3) button {
+  background-color: #F5923F;
+  color: white;
+}
+
+.calculator-field button:hover  {
+  background-color: #CDCDCD;
+}
+
+.calculator-field button:active {
+  background-color: #AFAFAF;
+}
+
+.calculator-field:nth-child(4) button:hover, .calculator-row:nth-child(5) .calculator-field:nth-child(3) button:hover {
+  background-color: #CF6000;
+}
+
+.calculator-field:nth-child(4) button:active, .calculator-row:nth-child(5) .calculator-field:nth-child(3) button:active {
+  background-color: #A64F04;
+}
