@@ -33,6 +33,7 @@ function dbgt() {
 function Calculator() {
   this.operands = []
   this.tailIndex = 0
+  this.inputSize = 3.0
   this.clearOrAllClear = 'all'
   this.domElements = {
     'Numbers': [
@@ -65,13 +66,33 @@ function Calculator() {
   this.updateDisplayNode = function() {
     var nodeToAdd = this.domElements.CurrentInput.firstChild
 
+    function lineHeightFromFontSize(fontSize, deltaSize) {
+      return ( 2.0 - (deltaSize*1.8) ).toString() // f(x) = 2 - 1.8x
+    }
+
     if( !nodeToAdd ) {
       nodeToAdd = document.createElement('p')
       nodeToAdd.style.margin = 0
+      nodeToAdd.style.display = 'table-cell'
       this.domElements.CurrentInput.appendChild(nodeToAdd)
     }
     nodeToAdd.textContent = this.operands.join('')
     this.domElements.Operators.Clear.textContent = this.clearOrAllClear === 'all' ? 'AC' : 'C'
+
+    // TODO: Setup dynamic resizing:
+    // Resize line height. Not working at the moment. 
+    // Upon resize, line height is too low, but technically word fits so while loop for reducing
+    // the size, the widths are indeed accurate. (it's vertical overflow thats the problem)
+    // while(this.domElements.CurrentInput.scrollWidth > this.domElements.CurrentInput.parentNode.clientWidth && this.inputSize >= 1.5) {
+    //   this.inputSize -= 0.1
+    //   this.domElements.CurrentInput.style.fontSize = this.inputSize.toString() + 'em'
+    //   this.domElements.CurrentInput.style.lineHeight = lineHeightFromFontSize(this.inputSize, -0.1) + 'em'
+    // }
+    // while(this.domElements.CurrentInput.scrollWidth <= this.domElements.CurrentInput.parentNode.clientWidth && this.inputSize < 3) {
+    //   this.inputSize += 0.1
+    //   this.domElements.CurrentInput.style.fontSize = this.inputSize.toString() + 'em'
+    //   this.domElements.CurrentInput.style.lineHeight = lineHeightFromFontSize(this.inputSize, 0.1) + 'em'
+    // }
   }
 
   this.handleNumberInput = function(numberInput) {

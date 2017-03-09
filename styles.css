@@ -18,6 +18,13 @@ body {
 .calculator-current-input {
   height: 60%;
   z-index: 5;
+  white-space: nowrap;
+  overflow-x: auto;
+  display: table;
+  width: 100%;
+  text-align: right;
+  vertical-align: bottom;
+  font-size: 3em;
 }
 
 .calculator-container {
