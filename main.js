@@ -1,5 +1,5 @@
 'use strict'
-var DEBUG = true
+var DEBUG = false
 if(DEBUG){
   var dbg = document.createElement('p')
   dbg.textContent = 'default text'
@@ -153,11 +153,61 @@ function Calculator() {
       case 'Flip':
         break
       case 'Equals':
+        this.calculateEquals()
         break
       default:
         break
     }
     this.updateDisplayNode()
+  }
+
+  this.calculateEquals = function(leftOperandStr, rightOperandStr) {
+    try {
+      if(this.operands.length <= 0) {
+        return 0
+      }
+      for( var i in this.operands ) {
+        i = parseInt(i)
+        if(!this.operands[i+1]) {
+          return this.operands[i]
+        }
+        var accumulateResult = this.calculate(this.operands[i], this.operands[i+1])
+        this.operands.shift()
+        this.tailIndex--
+        this.operands[i] = accumulateResult 
+      }
+    } catch(err) {
+      dbgt(err)
+      console.error(err)
+      this.clearOrAllClear = 'all'
+      handleOperatorInput('Clear')
+    }
+    this.updateDisplayNode()
+  }
+  this.calculate = function(leftOperandStr, rightOperandStr) {
+    var operator = leftOperandStr.match( /[^\s\d]/ )[0]
+    var leftOperand = parseInt( leftOperandStr.match( /\d*/ )[0] )
+    var rightOperand = parseInt( rightOperandStr.match( /\d*/ )[0] )
+    switch(operator) {
+      case '+':
+        return (leftOperand + rightOperand).toString()
+        break
+      case '-':
+        return (leftOperand - rightOperand).toString()
+        break
+      case '÷':
+        if(rightOperand === 0) {
+          throw new Error('Cannot divide by zero')
+        }
+        return (leftOperand / rightOperand).toString()
+        break
+      case 'x':
+        return (leftOperand * rightOperand).toString()
+        break
+      default:
+        return null
+        break
+    }
   }
 
   this.keyDownInterpreter = function(keyEvent) {
@@ -189,7 +239,7 @@ function Calculator() {
       if( keyEvent.shiftKey && keyCode === 187 ) {
         this.handleOperatorInput.call(this, 'Plus')
       } else if( getOperatorFromCode.hasOwnProperty(keyCode) ) {
-        this.handleOperatorInput.call(this, getOperatorFromCode[keyCode] + keyEvent)
+        this.handleOperatorInput.call(this, getOperatorFromCode[keyCode])
       }
     }
 
