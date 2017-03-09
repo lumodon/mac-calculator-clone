@@ -166,15 +166,14 @@ function Calculator() {
       if(this.operands.length <= 0) {
         return 0
       }
-      for( var i in this.operands ) {
-        i = parseInt(i)
-        if(!this.operands[i+1]) {
-          return this.operands[i]
+      while( this.operands.length > 1 ) {
+        if(!this.operands[1]) {
+          return this.operands[0]
         }
-        var accumulateResult = this.calculate(this.operands[i], this.operands[i+1])
+        var accumulateResult = this.calculate(this.operands[0], this.operands[1])
         this.operands.shift()
         this.tailIndex--
-        this.operands[i] = accumulateResult 
+        this.operands[0] = accumulateResult 
       }
     } catch(err) {
       dbgt(err)
@@ -185,29 +184,38 @@ function Calculator() {
     this.updateDisplayNode()
   }
   this.calculate = function(leftOperandStr, rightOperandStr) {
-    var operator = leftOperandStr.match( /[^\s\d]/ )[0]
-    var leftOperand = parseInt( leftOperandStr.match( /\d*/ )[0] )
-    var rightOperand = parseInt( rightOperandStr.match( /\d*/ )[0] )
-    switch(operator) {
+    var currentOperator = leftOperandStr.match( /[^\s\d\.]/ )[0]
+    var nextOperator = rightOperandStr.match( /[^\s\d\.]/ )
+    if(nextOperator) {
+      nextOperator = nextOperator[0]
+    }
+    var leftOperand = parseInt( leftOperandStr.match( /[\d\.]*/ )[0] )
+    var rightOperand = parseInt( rightOperandStr.match( /[\d\.]*/ )[0] )
+    var returnStr
+    switch(currentOperator) {
       case '+':
-        return (leftOperand + rightOperand).toString()
+        returnStr = (leftOperand + rightOperand).toString()
         break
       case '-':
-        return (leftOperand - rightOperand).toString()
+        returnStr = (leftOperand - rightOperand).toString()
         break
       case '÷':
         if(rightOperand === 0) {
           throw new Error('Cannot divide by zero')
         }
-        return (leftOperand / rightOperand).toString()
+        returnStr = (leftOperand / rightOperand).toString()
         break
       case 'x':
-        return (leftOperand * rightOperand).toString()
+        returnStr = (leftOperand * rightOperand).toString()
         break
       default:
         return null
         break
     }
+    if(nextOperator) {
+      returnStr += ' ' + nextOperator + ' '
+    }
+    return returnStr
   }
 
   this.keyDownInterpreter = function(keyEvent) {
